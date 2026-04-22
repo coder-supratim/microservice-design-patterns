@@ -11,9 +11,9 @@
 	<groupId>com.kish.mcdp</groupId>
 	<artifactId>order-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
-	<url/>
+	<name>Order Service</name>
+	<description>Microservice for managing orders</description>
+	<url>https://github.com/microservice-design-patterns</url>
 	<licenses>
 		<license/>
 	</licenses>
