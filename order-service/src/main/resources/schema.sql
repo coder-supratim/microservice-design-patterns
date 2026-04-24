@@ -25,9 +25,9 @@ CREATE TABLE IF NOT EXISTS order_items (
     order_id BIGINT NOT NULL REFERENCES orders(id) ON DELETE CASCADE
 );
 
--- Create indexes
-CREATE INDEX idx_order_number ON orders(order_number);
-CREATE INDEX idx_customer_id ON orders(customer_id);
-CREATE INDEX idx_status ON orders(status);
-CREATE INDEX idx_order_items_order_id ON order_items(order_id);
+-- Create indexes (use IF NOT EXISTS to avoid errors when re-running)
+CREATE INDEX IF NOT EXISTS idx_order_number ON orders(order_number);
+CREATE INDEX IF NOT EXISTS idx_customer_id ON orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_status ON orders(status);
+CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
 
