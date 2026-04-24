@@ -15,11 +15,13 @@ A Spring Boot microservice for managing orders in a microservice architecture us
 - Spring Boot DevTools (development)
 - Lombok (for reducing boilerplate code)
 - PostgreSQL JDBC Driver
+- Springdoc OpenAPI (Swagger/OpenAPI documentation)
 
 ## Project Structure
 
 ```
 src/main/java/com/kish/mcdp/
+├── config/              # Configuration classes (OpenAPIConfig)
 ├── entity/              # Domain entities (Order, OrderItem)
 ├── dto/                 # Data Transfer Objects (OrderDTO, OrderItemDTO)
 ├── repository/          # Data access layer (OrderRepository)
@@ -81,6 +83,22 @@ The application will start on port 8080 and automatically create tables if they 
 - **GET** `/api/orders/{id}` - Get a specific order by ID
 - **PUT** `/api/orders/{id}` - Update an existing order
 - **DELETE** `/api/orders/{id}` - Delete an order
+
+## API Documentation
+
+### Swagger UI
+Interactive API documentation is available at:
+```
+http://localhost:8080/swagger-ui.html
+```
+
+### OpenAPI Specification
+The OpenAPI JSON specification is available at:
+```
+http://localhost:8080/v3/api-docs
+```
+
+For detailed documentation, see [SWAGGER_GUIDE.md](SWAGGER_GUIDE.md)
 
 ### Example Request Body (Create/Update Order)
 

@@ -11,6 +11,7 @@ The Order Service microservice has been successfully implemented with **PostgreS
 ### Start Here
 - **[IMPLEMENTATION_COMPLETE.md](IMPLEMENTATION_COMPLETE.md)** - Overview & quick setup
 - **[QUICK_START.md](QUICK_START.md)** - 5-minute setup guide
+- **[SWAGGER_GUIDE.md](SWAGGER_GUIDE.md)** - Swagger/OpenAPI documentation
 
 ### Documentation
 - **[README.md](README.md)** - Project overview
@@ -33,6 +34,7 @@ order-service/
 │   ├── POSTGRESQL_INTEGRATION.md
 │   ├── QUICK_START.md
 │   ├── README.md
+│   ├── SWAGGER_GUIDE.md
 │   └── TESTING_GUIDE.md
 │
 ├── 🔧 Configuration
@@ -43,6 +45,10 @@ order-service/
 │
 └── 💻 Source Code
     └── src/main/java/com/kish/mcdp/
+        │
+        ├── ⚙️ Configuration
+        │   └── config/
+        │       └── OpenAPIConfig.java       # Swagger/OpenAPI config
         │
         ├── 🎯 Entity Models
         │   └── entity/
@@ -96,6 +102,8 @@ order-service/
 - [x] Automatic total price calculation
 - [x] Transaction management with @Transactional
 - [x] CORS support
+- [x] Swagger/OpenAPI documentation with UI
+- [x] Comprehensive API annotations
 
 ### ✅ Database
 - [x] PostgreSQL integration
@@ -128,7 +136,12 @@ cd /Users/kishorevanam/git/microservice-design-patterns/order-service
 ./mvnw spring-boot:run
 ```
 
-### 3️⃣ Test API
+### 3️⃣ Access Swagger UI
+```
+http://localhost:8080/swagger-ui.html
+```
+
+### 4️⃣ Test API
 ```bash
 # Health check
 curl http://localhost:8080/api/orders/health
@@ -145,7 +158,7 @@ curl -X POST http://localhost:8080/api/orders \
 curl http://localhost:8080/api/orders
 ```
 
-✅ **Done!** The service is running with PostgreSQL.
+✅ **Done!** The service is running with PostgreSQL and Swagger UI.
 
 ---
 
@@ -269,6 +282,7 @@ spring:
 | File | Purpose | Read Time |
 |------|---------|-----------|
 | **QUICK_START.md** | Fast setup guide | 5 min |
+| **SWAGGER_GUIDE.md** | Swagger/OpenAPI guide | 10 min |
 | **API_DOCUMENTATION.md** | Complete API reference | 10 min |
 | **DATABASE_SETUP.md** | Database setup details | 5 min |
 | **POSTGRESQL_INTEGRATION.md** | Technical architecture | 15 min |
@@ -366,6 +380,7 @@ ENTRYPOINT ["java", "-jar", "/app.jar"]
 - ✅ Transaction management
 - ✅ Error handling
 - ✅ CORS support
+- ✅ **Swagger/OpenAPI documentation with interactive UI**
 - ✅ Comprehensive documentation
 - ✅ Testing guides
 
@@ -375,5 +390,5 @@ ENTRYPOINT ["java", "-jar", "/app.jar"]
 
 **Created:** April 2026  
 **Version:** 0.0.1-SNAPSHOT  
-**Technology:** Spring Boot 4.0.5, Java 21, PostgreSQL, Maven
+**Technology:** Spring Boot 4.0.5, Java 21, PostgreSQL, Maven, Springdoc OpenAPI
 
