@@ -5,6 +5,7 @@ import com.kish.mcdp.dto.OrderItemDTO;
 import com.kish.mcdp.entity.Order;
 import com.kish.mcdp.entity.OrderItem;
 import com.kish.mcdp.repository.OrderRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -26,7 +28,7 @@ public class OrderService {
             .status("PENDING")
             .customerId(orderDTO.getCustomerId())
             .totalPrice(calculateTotalPrice(orderDTO.getItems()))
-            .items(convertItemDTOsToEntities(orderDTO.getItems()))
+            .items(convertItemDTOsToEntities(orderDTO.getItems(), null))
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();
@@ -48,6 +50,20 @@ public class OrderService {
             .collect(Collectors.toList());
     }
 
+    public List<OrderDTO> getOrdersByCustomerId(String customerId) {
+        return orderRepository.findByCustomerId(customerId)
+            .stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+    }
+
+    public List<OrderDTO> getOrdersByStatus(String status) {
+        return orderRepository.findByStatus(status)
+            .stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+    }
+
     public OrderDTO updateOrder(Long id, OrderDTO orderDTO) {
         Order order = orderRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
@@ -55,8 +71,10 @@ public class OrderService {
         if (orderDTO.getStatus() != null) {
             order.setStatus(orderDTO.getStatus());
         }
-        if (orderDTO.getItems() != null) {
-            order.setItems(convertItemDTOsToEntities(orderDTO.getItems()));
+        if (orderDTO.getItems() != null && !orderDTO.getItems().isEmpty()) {
+            order.getItems().clear();
+            List<OrderItem> newItems = convertItemDTOsToEntities(orderDTO.getItems(), order);
+            order.setItems(newItems);
             order.setTotalPrice(calculateTotalPrice(orderDTO.getItems()));
         }
         order.setUpdatedAt(LocalDateTime.now());
@@ -85,7 +103,7 @@ public class OrderService {
             .sum();
     }
 
-    private List<OrderItem> convertItemDTOsToEntities(List<OrderItemDTO> itemDTOs) {
+    private List<OrderItem> convertItemDTOsToEntities(List<OrderItemDTO> itemDTOs, Order order) {
         if (itemDTOs == null) {
             return null;
         }
@@ -96,6 +114,7 @@ public class OrderService {
                 .quantity(dto.getQuantity())
                 .unitPrice(dto.getUnitPrice())
                 .totalPrice(dto.getQuantity() * dto.getUnitPrice())
+                .order(order)
                 .build())
             .collect(Collectors.toList());
     }

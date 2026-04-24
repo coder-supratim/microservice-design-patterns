@@ -32,8 +32,19 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderDTO>> getAllOrders() {
-        List<OrderDTO> orders = orderService.getAllOrders();
+    public ResponseEntity<List<OrderDTO>> getAllOrders(
+            @RequestParam(required = false) String customerId,
+            @RequestParam(required = false) String status) {
+        List<OrderDTO> orders;
+
+        if (customerId != null) {
+            orders = orderService.getOrdersByCustomerId(customerId);
+        } else if (status != null) {
+            orders = orderService.getOrdersByStatus(status);
+        } else {
+            orders = orderService.getAllOrders();
+        }
+
         return ResponseEntity.ok(orders);
     }
 

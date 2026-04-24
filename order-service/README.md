@@ -1,17 +1,20 @@
 # Order Service
 
-A Spring Boot microservice for managing orders in a microservice architecture.
+A Spring Boot microservice for managing orders in a microservice architecture using PostgreSQL for data persistence.
 
 ## Prerequisites
 
 - Java 21
 - Maven 3.6+
+- PostgreSQL 12+ running on localhost:5432
 
 ## Dependencies
 
 - Spring Boot Web MVC
+- Spring Boot Data JPA
 - Spring Boot DevTools (development)
 - Lombok (for reducing boilerplate code)
+- PostgreSQL JDBC Driver
 
 ## Project Structure
 
@@ -26,10 +29,31 @@ src/main/java/com/kish/mcdp/
 └── OrderServiceApplication.java  # Main application class
 ```
 
+## Database Setup
+
+Before running the application, you need to set up PostgreSQL:
+
+1. **Create the database:**
+   ```bash
+   psql -U postgres
+   CREATE DATABASE order_db;
+   \q
+   ```
+
+2. **Create tables (Hibernate will auto-create them, but you can also run the script):**
+   ```bash
+   psql -U postgres -d order_db -f src/main/resources/schema.sql
+   ```
+
+3. **Update database credentials if needed:**
+   Edit `src/main/resources/application.yaml` with your PostgreSQL credentials.
+
+For detailed database setup instructions, see [DATABASE_SETUP.md](DATABASE_SETUP.md)
+
 ## Running the Application
 
-1. Clone the repository.
-2. Navigate to the project directory.
+1. Ensure PostgreSQL is running and the `order_db` database exists
+2. Navigate to the project directory
 3. Run the application using Maven:
 
    ```bash
@@ -42,7 +66,7 @@ src/main/java/com/kish/mcdp/
    mvn spring-boot:run
    ```
 
-The application will start on the default port 8080.
+The application will start on port 8080 and automatically create tables if they don't exist.
 
 ## REST API Endpoints
 
@@ -51,7 +75,9 @@ The application will start on the default port 8080.
 
 ### Order Management
 - **POST** `/api/orders` - Create a new order
-- **GET** `/api/orders` - Get all orders
+- **GET** `/api/orders` - Get all orders (supports filtering)
+- **GET** `/api/orders?customerId=CUST001` - Get orders by customer ID
+- **GET** `/api/orders?status=PENDING` - Get orders by status
 - **GET** `/api/orders/{id}` - Get a specific order by ID
 - **PUT** `/api/orders/{id}` - Update an existing order
 - **DELETE** `/api/orders/{id}` - Delete an order
@@ -75,7 +101,28 @@ The application will start on the default port 8080.
 
 ## Configuration
 
-The application configuration is in `src/main/resources/application.yaml`. Currently, it sets the application name to `order-service`.
+The application configuration is in `src/main/resources/application.yaml`. Default settings:
+
+```yaml
+spring:
+  application:
+    name: order-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/order_db
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update  # Auto-create/update tables
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8080
+```
+
+Update these values if your PostgreSQL installation uses different credentials or is on a different host/port.
 
 ## Building
 

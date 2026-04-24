@@ -84,7 +84,23 @@ Body: "Order Service is running"
 ### 3. Get All Orders
 **Endpoint:** `GET /api/orders`
 
-**Description:** Retrieve all orders.
+**Description:** Retrieve all orders with optional filtering.
+
+**Query Parameters (optional):**
+- `customerId` - Filter orders by customer ID
+- `status` - Filter orders by status
+
+**Example Requests:**
+```bash
+# Get all orders
+GET /api/orders
+
+# Get orders by customer
+GET /api/orders?customerId=CUST001
+
+# Get orders by status
+GET /api/orders?status=PENDING
+```
 
 **Response:**
 ```json
@@ -256,6 +272,12 @@ curl -X POST http://localhost:8080/api/orders \
 
 # Get all orders
 curl -X GET http://localhost:8080/api/orders
+
+# Get orders by customer
+curl -X GET "http://localhost:8080/api/orders?customerId=CUST001"
+
+# Get orders by status
+curl -X GET "http://localhost:8080/api/orders?status=PENDING"
 
 # Get specific order
 curl -X GET http://localhost:8080/api/orders/1
