@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -16,7 +15,7 @@ import java.util.List;
 @Schema(
     name = "OrderDTO",
     description = "Data Transfer Object for Order",
-    example = "{\"id\":1,\"orderNumber\":\"ORD-1234567890\",\"status\":\"PENDING\",\"customerId\":\"CUST001\",\"totalPrice\":1050.0}"
+    example = "{\"id\":1,\"orderNumber\":\"ORD-1234567890\",\"status\":\"PENDING\",\"customerId\":\"CUST001\",\"totalPrice\":1050.0,\"item\":{\"id\":1,\"productId\":\"PROD001\",\"productName\":\"Laptop\",\"quantity\":1,\"unitPrice\":1000.0,\"totalPrice\":1000.0}}"
 )
 public class OrderDTO {
 
@@ -35,8 +34,8 @@ public class OrderDTO {
     @Schema(description = "Total order price", example = "1050.0", accessMode = Schema.AccessMode.READ_ONLY)
     private Double totalPrice;
 
-    @Schema(description = "List of order items", required = true)
-    private List<OrderItemDTO> items;
+    @Schema(description = "Order item", required = true)
+    private OrderItemDTO item;
 
     @Schema(description = "Order creation timestamp", example = "2026-04-23T10:30:00", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime createdAt;
@@ -44,4 +43,6 @@ public class OrderDTO {
     @Schema(description = "Order last update timestamp", example = "2026-04-23T10:30:00", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime updatedAt;
 }
+
+
 

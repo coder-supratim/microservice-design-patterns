@@ -30,7 +30,7 @@ public class OrderController {
     @PostMapping
     @Operation(
         summary = "Create a new order",
-        description = "Creates a new order with the provided customer ID and order items. Automatically generates order number and sets status to PENDING."
+        description = "Creates a new order with the provided customer ID and order item. Automatically generates order number and sets status to PENDING."
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Order created successfully",
@@ -95,7 +95,7 @@ public class OrderController {
     @PutMapping("/{id}")
     @Operation(
         summary = "Update an existing order",
-        description = "Updates order status and/or items. Recalculates total price if items are updated."
+        description = "Updates order status and/or item. Recalculates total price if item is updated."
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Order updated successfully",
@@ -119,7 +119,7 @@ public class OrderController {
     @DeleteMapping("/{id}")
     @Operation(
         summary = "Delete an order",
-        description = "Deletes an order and all associated order items"
+        description = "Deletes an order and its associated item"
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Order deleted successfully"),

@@ -23,16 +23,31 @@ public class OrderService {
     }
 
     public OrderDTO createOrder(OrderDTO orderDTO) {
+        if (orderDTO.getItem() == null) {
+            throw new IllegalArgumentException("Order must contain an item");
+        }
+
+        Double totalPrice = orderDTO.getItem().getQuantity() * orderDTO.getItem().getUnitPrice();
+
+        OrderItem item = OrderItem.builder()
+            .productId(orderDTO.getItem().getProductId())
+            .productName(orderDTO.getItem().getProductName())
+            .quantity(orderDTO.getItem().getQuantity())
+            .unitPrice(orderDTO.getItem().getUnitPrice())
+            .totalPrice(totalPrice)
+            .build();
+
         Order order = Order.builder()
             .orderNumber(generateOrderNumber())
             .status("PENDING")
             .customerId(orderDTO.getCustomerId())
-            .totalPrice(calculateTotalPrice(orderDTO.getItems()))
-            .items(convertItemDTOsToEntities(orderDTO.getItems(), null))
+            .totalPrice(totalPrice)
+            .item(item)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();
 
+        item.setOrder(order);
         Order savedOrder = orderRepository.save(order);
         return convertToDTO(savedOrder);
     }
@@ -71,12 +86,29 @@ public class OrderService {
         if (orderDTO.getStatus() != null) {
             order.setStatus(orderDTO.getStatus());
         }
-        if (orderDTO.getItems() != null && !orderDTO.getItems().isEmpty()) {
-            order.getItems().clear();
-            List<OrderItem> newItems = convertItemDTOsToEntities(orderDTO.getItems(), order);
-            order.setItems(newItems);
-            order.setTotalPrice(calculateTotalPrice(orderDTO.getItems()));
+
+        if (orderDTO.getItem() != null) {
+            OrderItem existingItem = order.getItem();
+            if (existingItem != null) {
+                existingItem.setProductId(orderDTO.getItem().getProductId());
+                existingItem.setProductName(orderDTO.getItem().getProductName());
+                existingItem.setQuantity(orderDTO.getItem().getQuantity());
+                existingItem.setUnitPrice(orderDTO.getItem().getUnitPrice());
+                existingItem.setTotalPrice(orderDTO.getItem().getQuantity() * orderDTO.getItem().getUnitPrice());
+            } else {
+                OrderItem newItem = OrderItem.builder()
+                    .productId(orderDTO.getItem().getProductId())
+                    .productName(orderDTO.getItem().getProductName())
+                    .quantity(orderDTO.getItem().getQuantity())
+                    .unitPrice(orderDTO.getItem().getUnitPrice())
+                    .totalPrice(orderDTO.getItem().getQuantity() * orderDTO.getItem().getUnitPrice())
+                    .order(order)
+                    .build();
+                order.setItem(newItem);
+            }
+            order.setTotalPrice(orderDTO.getItem().getQuantity() * orderDTO.getItem().getUnitPrice());
         }
+
         order.setUpdatedAt(LocalDateTime.now());
 
         Order updatedOrder = orderRepository.save(order);
@@ -94,44 +126,17 @@ public class OrderService {
         return "ORD-" + System.currentTimeMillis();
     }
 
-    private Double calculateTotalPrice(List<OrderItemDTO> items) {
-        if (items == null || items.isEmpty()) {
-            return 0.0;
-        }
-        return items.stream()
-            .mapToDouble(item -> item.getQuantity() * item.getUnitPrice())
-            .sum();
-    }
-
-    private List<OrderItem> convertItemDTOsToEntities(List<OrderItemDTO> itemDTOs, Order order) {
-        if (itemDTOs == null) {
-            return null;
-        }
-        return itemDTOs.stream()
-            .map(dto -> OrderItem.builder()
-                .productId(dto.getProductId())
-                .productName(dto.getProductName())
-                .quantity(dto.getQuantity())
-                .unitPrice(dto.getUnitPrice())
-                .totalPrice(dto.getQuantity() * dto.getUnitPrice())
-                .order(order)
-                .build())
-            .collect(Collectors.toList());
-    }
-
     private OrderDTO convertToDTO(Order order) {
-        List<OrderItemDTO> itemDTOs = null;
-        if (order.getItems() != null) {
-            itemDTOs = order.getItems().stream()
-                .map(item -> OrderItemDTO.builder()
-                    .id(item.getId())
-                    .productId(item.getProductId())
-                    .productName(item.getProductName())
-                    .quantity(item.getQuantity())
-                    .unitPrice(item.getUnitPrice())
-                    .totalPrice(item.getTotalPrice())
-                    .build())
-                .collect(Collectors.toList());
+        OrderItemDTO itemDTO = null;
+        if (order.getItem() != null) {
+            itemDTO = OrderItemDTO.builder()
+                .id(order.getItem().getId())
+                .productId(order.getItem().getProductId())
+                .productName(order.getItem().getProductName())
+                .quantity(order.getItem().getQuantity())
+                .unitPrice(order.getItem().getUnitPrice())
+                .totalPrice(order.getItem().getTotalPrice())
+                .build();
         }
 
         return OrderDTO.builder()
@@ -140,7 +145,7 @@ public class OrderService {
             .status(order.getStatus())
             .customerId(order.getCustomerId())
             .totalPrice(order.getTotalPrice())
-            .items(itemDTOs)
+            .item(itemDTO)
             .createdAt(order.getCreatedAt())
             .updatedAt(order.getUpdatedAt())
             .build();

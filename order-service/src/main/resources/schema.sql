@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS order_items (
     quantity INTEGER NOT NULL,
     unit_price DECIMAL(10, 2) NOT NULL,
     total_price DECIMAL(10, 2),
-    order_id BIGINT NOT NULL REFERENCES orders(id) ON DELETE CASCADE
+    order_id BIGINT NOT NULL UNIQUE REFERENCES orders(id) ON DELETE CASCADE
 );
 
 -- Create indexes (use IF NOT EXISTS to avoid errors when re-running)
