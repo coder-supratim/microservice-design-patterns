@@ -1,0 +1,58 @@
+services:
+  # PostgreSQL Database Service
+  postgres:
+    image: postgres:16-alpine
+    container_name: order-service-postgres
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-order_db}
+      POSTGRES_USER: ${POSTGRES_USER:-kishorevanam}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kishorevanam}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kishorevanam -d order_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - order-network
+    restart: unless-stopped
+
+  # Order Service Application
+  order-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: order-service-app
+    ports:
+      - "8080:8080"
+    env_file: .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-order_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-kishorevanam}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-kishorevanam}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO:-update}
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: ${SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT:-org.hibernate.dialect.PostgreSQLDialect}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - order-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  order-network:
+    driver: bridge
+
+
+
+

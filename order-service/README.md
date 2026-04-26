@@ -19,6 +19,8 @@ The Order Service microservice has been successfully implemented with:
 - [Quick Start](#quick-start)
 - [Database Setup](#database-setup)
 - [Running the Application](#running-the-application)
+  - [Docker Compose Setup](#docker--docker-compose-recommended-)
+  - [Local Java Execution](#development-mode)
 - [API Documentation](#api-documentation)
 - [Testing](#testing)
 - [Project Structure](#project-structure)
@@ -33,7 +35,17 @@ The Order Service microservice has been successfully implemented with:
 
 - **Java 21** - Required for Spring Boot 4.0.5
 - **Maven 3.6+** - Build tool
-- **PostgreSQL 12+** - Database server running on localhost:5432
+- **PostgreSQL 12+** - Database server running on localhost:5432 (for local development)
+- **Docker & Docker Compose** - For containerized setup (recommended)
+
+### Option A: For Docker/Docker Compose Setup
+- Docker Desktop (includes Docker Compose)
+- No need for local PostgreSQL installation
+
+### Option B: For Local Java Development
+- Java 21
+- Maven 3.6+
+- Local PostgreSQL 12+ instance
 
 ### Verify Prerequisites
 
@@ -196,11 +208,85 @@ Update credentials if your PostgreSQL setup differs.
 java -jar target/order-service-0.0.1-SNAPSHOT.jar
 ```
 
-### Docker (Optional)
-```dockerfile
-FROM openjdk:21-jdk-slim
-COPY target/order-service-0.0.1-SNAPSHOT.jar app.jar
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+### Docker & Docker Compose (Recommended) 🐳
+
+#### Option 1: Using Docker Compose (Recommended)
+
+**Prerequisites**: Docker Desktop installed
+
+**Step 1: Build the Application**
+```bash
+cd /Users/kishorevanam/git/microservice-design-patterns/order-service
+./mvnw clean package
+```
+
+**Step 2: Start All Services**
+```bash
+docker-compose up -d
+```
+
+**Step 3: Verify Services**
+```bash
+docker-compose ps
+```
+
+Expected output:
+```
+NAME                    STATUS              PORTS
+order-service-app      Up (healthy)        0.0.0.0:8080->8080/tcp
+order-service-postgres Up (healthy)        0.0.0.0:5432->5432/tcp
+```
+
+**Step 4: Access the Application**
+- **Swagger UI**: http://localhost:8080/swagger-ui.html
+- **Health Check**: http://localhost:8080/api/orders/health
+
+**Useful Commands**:
+```bash
+# View logs
+docker-compose logs -f
+
+# View specific service logs
+docker-compose logs -f order-service
+
+# Stop services
+docker-compose down
+
+# Stop and remove volumes
+docker-compose down -v
+```
+
+**Environment Variables** (`.env` file):
+```env
+POSTGRES_DB=order_db
+POSTGRES_USER=kishorevanam
+POSTGRES_PASSWORD=kishorevanam
+```
+
+For complete Docker Compose guide, see [DOCKER_COMPOSE_GUIDE.md](DOCKER_COMPOSE_GUIDE.md)
+
+#### Option 2: Traditional Docker
+
+Build and run individual services:
+
+```bash
+# Build Order Service image
+docker build -t order-service:latest .
+
+# Run PostgreSQL
+docker run --name postgres-container \
+  -e POSTGRES_DB=order_db \
+  -e POSTGRES_USER=kishorevanam \
+  -e POSTGRES_PASSWORD=kishorevanam \
+  -p 5432:5432 \
+  postgres:16-alpine
+
+# Run Order Service
+docker run -p 8080:8080 \
+  -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/order_db \
+  -e SPRING_DATASOURCE_USERNAME=kishorevanam \
+  -e SPRING_DATASOURCE_PASSWORD=kishorevanam \
+  order-service:latest
 ```
 
 ---
@@ -571,7 +657,15 @@ java -jar target/order-service-0.0.1-SNAPSHOT.jar
 docker build -t order-service .
 
 # Run container
-docker run -p 8080:8080 order-service
+docker run -d -p 8080:8080 --name order-service order-service:1.0
+```
+
+### Rebuild docker image after code changes
+```bash
+docker build -t order-service:1.1 .
+docker stop order-service
+docker rm order-service
+docker run -d -p 8080:8080 --name order-service order-service:1.1
 ```
 
 ### Maven Commands

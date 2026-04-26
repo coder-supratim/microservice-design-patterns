@@ -2,16 +2,16 @@ spring:
   application:
     name: order-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username:
-    password:
+    url: jdbc:postgresql://${SPRING_DATASOURCE_URL:localhost:5432/order_db}
+    username: ${SPRING_DATASOURCE_USERNAME:kishorevanam}
+    password: ${SPRING_DATASOURCE_PASSWORD:kishorevanam}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: ${SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
         format_sql: true
     show-sql: false
   sql:
@@ -20,3 +20,12 @@ spring:
 
 server:
   port: 8080
+
+# Logging configuration
+logging:
+  level:
+    root: INFO
+    com.kish.mcdp: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+
