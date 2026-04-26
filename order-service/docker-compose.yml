@@ -5,7 +5,7 @@ services:
     container_name: order-service-postgres
     env_file: .env
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-order_db}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
       POSTGRES_USER: ${POSTGRES_USER:-kishorevanam}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kishorevanam}
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
@@ -15,7 +15,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U kishorevanam -d order_db"]
+      test: ["CMD-SHELL", "pg_isready -U kishorevanam -d postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -33,7 +33,7 @@ services:
       - "8080:8080"
     env_file: .env
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-order_db}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-postgres}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-kishorevanam}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-kishorevanam}
       SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO:-update}

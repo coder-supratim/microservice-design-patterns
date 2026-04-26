@@ -2,7 +2,7 @@
 -- Run this script in PostgreSQL to create the database and tables
 
 -- Create database (optional - can be created manually)
--- CREATE DATABASE order_db;
+-- CREATE DATABASE postgres;
 
 -- Create tables
 CREATE TABLE IF NOT EXISTS orders (

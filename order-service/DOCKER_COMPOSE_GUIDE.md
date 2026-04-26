@@ -128,7 +128,7 @@ docker-compose build --no-cache
 
 ```bash
 # PostgreSQL CLI
-docker-compose exec postgres psql -U kishorevanam -d order_db
+docker-compose exec postgres psql -U kishorevanam -d postgres
 
 # Order Service bash
 docker-compose exec order-service bash
